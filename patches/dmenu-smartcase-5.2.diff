@@ -1,0 +1,55 @@
+From 31b16de664a242f4f629b877214441143c16faba Mon Sep 17 00:00:00 2001
+From: Stanisław Bitner <sbitner420@tutanota.com>
+Date: Fri, 6 Oct 2023 16:36:12 +0200
+Subject: [PATCH] smartcase
+
+---
+ dmenu.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/dmenu.c b/dmenu.c
+index 40f93e0..f6ec485 100644
+--- a/dmenu.c
++++ b/dmenu.c
+@@ -129,6 +129,19 @@ cistrstr(const char *h, const char *n)
+ 	return NULL;
+ }
+ 
++static char *
++scsstrstr(const char *h, const char *n)
++{
++	const char *p;
++
++	for (p = n; *p; p++) {
++		if ('A' <= *p && *p <= 'Z')
++			return strstr(h, n);
++	}
++
++	return cistrstr(h, n);
++}
++
+ static int
+ drawitem(struct item *item, int x, int y, int w)
+ {
+@@ -715,7 +728,7 @@ setup(void)
+ static void
+ usage(void)
+ {
+-	die("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
++	die("usage: dmenu [-bfisv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
+ 	    "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]");
+ }
+ 
+@@ -737,6 +750,9 @@ main(int argc, char *argv[])
+ 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
+ 			fstrncmp = strncasecmp;
+ 			fstrstr = cistrstr;
++		} else if (!strcmp(argv[i], "-s")) { /* smart case item matching */
++			fstrncmp = strncasecmp;
++			fstrstr = scsstrstr;
+ 		} else if (i + 1 == argc)
+ 			usage();
+ 		/* these options take one argument */
+-- 
+2.42.0
+
