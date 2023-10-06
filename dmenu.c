@@ -129,6 +129,19 @@ cistrstr(const char *h, const char *n)
 	return NULL;
 }
 
+static char *
+scsstrstr(const char *h, const char *n)
+{
+	const char *p;
+
+	for (p = n; *p; p++) {
+		if ('A' <= *p && *p <= 'Z')
+			return strstr(h, n);
+	}
+
+	return cistrstr(h, n);
+}
+
 static int
 drawitem(struct item *item, int x, int y, int w)
 {
@@ -858,7 +871,7 @@ setup(void)
 static void
 usage(void)
 {
-	die("usage: dmenu [-bfiv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
+	die("usage: dmenu [-bfisv] [-l lines] [-p prompt] [-fn font] [-m monitor]\n"
 	    "             [-nb color] [-nf color] [-sb color] [-sf color] [-w windowid]");
 }
 
@@ -880,6 +893,9 @@ main(int argc, char *argv[])
 		else if (!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
 			fstrncmp = strncasecmp;
 			fstrstr = cistrstr;
+		} else if (!strcmp(argv[i], "-s")) { /* smart case item matching */
+			fstrncmp = strncasecmp;
+			fstrstr = scsstrstr;
 		} else if (i + 1 == argc)
 			usage();
 		/* these options take one argument */
